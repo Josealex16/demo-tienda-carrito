@@ -30,7 +30,7 @@ export function removeFromCart(lines: CartLine[], productId: string): CartLine[]
 }
 
 export function subtotal(lines: CartLine[]): number {
-  return lines.reduce((sum, line) => sum + line.product.price, 0);
+  return lines.reduce((sum, line) => sum + line.product.price * line.quantity, 0);
 }
 
 export function igv(lines: CartLine[]): number {

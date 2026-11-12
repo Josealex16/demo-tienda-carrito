@@ -14,6 +14,7 @@ export function ProductList({ products, onAdd }: Props) {
         {products.map((product) => (
           <li key={product.id} className="product">
             <h3>{product.name}</h3>
+            {product.promo && <span className="badge">{product.promo}</span>}
             <p className="price">{formatCurrency(product.price)}</p>
             <button type="button" onClick={() => onAdd(product)}>
               Agregar al carrito

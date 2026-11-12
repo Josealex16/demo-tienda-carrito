@@ -77,3 +77,20 @@ button.link:hover { background: none; color: var(--accent-dark); }
 .summary dl div { display: flex; justify-content: space-between; padding: 4px 0; }
 .summary dt, .summary dd { margin: 0; }
 .summary .total { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 8px; font-weight: 700; }
+
+.badge {
+  align-self: flex-start;
+  background: #f1e3d3;
+  color: var(--accent-dark);
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.coupon form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.coupon label { font-weight: 600; }
+.coupon input { font: inherit; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; width: 140px; }
+.coupon .applied { margin: 8px 0 0; display: flex; gap: 8px; align-items: center; }
+.coupon .error { color: #a12a1f; margin: 8px 0 0; }
+.summary .discount dd { color: #2d6a3e; }
