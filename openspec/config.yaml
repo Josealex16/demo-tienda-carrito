@@ -1,0 +1,7 @@
+schema: spec-driven
+
+context: |
+  Tienda Andes: tienda en linea de demostracion con carrito (Vite, React 18, TypeScript).
+  Interfaz en espanol e importes en soles. Las reglas de precio estan en el README
+  (promociones 3x2, cupones, envio e IGV) y el calculo vive en src/lib/pricing.ts.
+  Verificacion: npm run lint, npm test y npm run build deben quedar en verde.
