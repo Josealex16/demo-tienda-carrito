@@ -94,3 +94,19 @@ button.link:hover { background: none; color: var(--accent-dark); }
 .coupon .applied { margin: 8px 0 0; display: flex; gap: 8px; align-items: center; }
 .coupon .error { color: #a12a1f; margin: 8px 0 0; }
 .summary .discount dd { color: #2d6a3e; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+.toolbar-field { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 0.9rem; }
+.toolbar-field input, .toolbar-field select {
+  font: inherit;
+  font-weight: 400;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+.results { margin: 0 0 12px; color: var(--muted); }
+.stock { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.stock.sold-out { color: #8a1f17; font-weight: 600; }
+button:disabled { opacity: 0.5; cursor: not-allowed; background: var(--accent); }

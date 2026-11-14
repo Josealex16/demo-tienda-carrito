@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { products } from "./data/products";
+import { products, type Product } from "./data/products";
 import { Cart } from "./components/Cart";
 import { CouponForm } from "./components/CouponForm";
 import { ProductList } from "./components/ProductList";
@@ -12,6 +12,12 @@ export default function App() {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
+  const [reserved, setReserved] = useState<Record<string, number>>({});
+
+  function handleAdd(product: Product) {
+    setLines((l) => addToCart(l, product));
+    setReserved((r) => ({ ...r, [product.id]: (r[product.id] ?? 0) + 1 }));
+  }
 
   function handleApplyCoupon(code: string) {
     const result = applyCoupon(code, lines);
@@ -37,7 +43,7 @@ export default function App() {
         <p>Productos artesanales y de origen andino.</p>
       </header>
       <main>
-        <ProductList products={products} onAdd={(p) => setLines((l) => addToCart(l, p))} />
+        <ProductList products={products} reserved={reserved} onAdd={handleAdd} />
         <aside>
           <Cart
             lines={lines}
