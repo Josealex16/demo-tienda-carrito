@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { products, type Product } from "./data/products";
+import { Installments } from "./components/Installments";
 import { Cart } from "./components/Cart";
 import { CouponForm } from "./components/CouponForm";
 import { ProductList } from "./components/ProductList";
@@ -59,6 +60,7 @@ export default function App() {
           <Summary breakdown={breakdown} couponCode={coupon?.code ?? null} />
         </aside>
       </main>
+      <Installments total={breakdown.total} hasItems={lines.length > 0} />
     </div>
   );
 }
