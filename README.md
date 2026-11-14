@@ -1,6 +1,6 @@
 # Tienda Andes
 
-Página de tienda con carrito de compras, hecha con React 18, Vite y TypeScript. La interfaz está en español y los importes se muestran en soles (S/). Incluye lista de productos, carrito con control de cantidades y promociones 3x2, cupones de descuento, envío y resumen con subtotal, descuentos, IGV (18 %) y total.
+Página de tienda con carrito de compras, hecha con React 18, Vite y TypeScript. La interfaz está en español y los importes se muestran en soles (S/). Incluye catálogo con búsqueda, categorías, orden y stock, carrito con control de cantidades y promociones 3x2, cupones de descuento, envío y resumen con subtotal, descuentos, IGV (18 %) y total.
 
 ## Requisitos
 
@@ -24,8 +24,17 @@ Página de tienda con carrito de compras, hecha con React 18, Vite y TypeScript.
 - `src/lib/cart.ts`: funciones puras del carrito (agregar, cambiar cantidad, quitar, subtotal, IGV y total).
 - `src/lib/pricing.ts`: funciones puras de precio (promociones, cupones, envío, IGV y desglose).
 - `src/lib/format.ts`: formato de moneda.
-- `src/components/`: `ProductList`, `Cart`, `CouponForm` y `Summary`.
+- `src/lib/catalog.ts`: funciones puras del catálogo (búsqueda, categoría, orden y contador).
+- `src/components/`: `ProductList`, `CatalogToolbar`, `Cart`, `CouponForm` y `Summary`.
 - `src/App.tsx` y `src/main.tsx`: composición y punto de entrada.
+
+## Reglas del catálogo
+
+1. La búsqueda es por nombre y no distingue mayúsculas ni tildes («cafe» encuentra «Café de altura 250 g»).
+2. Categoría y búsqueda se combinan: un producto se muestra solo si cumple las dos.
+3. El orden por precio usa el valor numérico del precio; «Destacados» es el orden del catálogo.
+4. El contador muestra la cantidad de productos mostrados y, sin resultados, «No encontramos productos».
+5. «Quedan N» es el stock menos las unidades de ese producto en el carrito; con cero muestra «Agotado» y no se puede agregar. El botón «+» del carrito no permite superar el stock. Al disminuir o quitar un producto del carrito sus unidades vuelven a estar disponibles.
 
 ## Reglas de precio
 
