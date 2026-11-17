@@ -107,6 +107,20 @@ describe("App", () => {
     ).toBeInTheDocument();
   });
 
+  it("acepta BIENVENIDA20 sumando Poncho y Manta", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const add = screen.getAllByRole("button", { name: "Agregar al carrito" });
+    await user.click(add[0]);
+    await user.click(add[2]);
+    await user.type(screen.getByLabelText("Cupón"), "BIENVENIDA20");
+    await user.click(screen.getByRole("button", { name: "Aplicar" }));
+    const coupon = screen.getByText("Cupón BIENVENIDA20").parentElement as HTMLElement;
+    expect(within(coupon).getByText("− S/ 61.98")).toBeInTheDocument();
+    expect(screen.queryByText("El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00"))
+      .not.toBeInTheDocument();
+  });
+
   it("avisa cuando el cupón aplicado deja de cumplir el mínimo", async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -122,5 +136,27 @@ describe("App", () => {
       screen.getByText("El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00"),
     ).toBeInTheDocument();
     expect(within(coupon).getByText("S/ 0.00")).toBeInTheDocument();
+  });
+
+  it("actualiza la vigencia del cupón al cambiar un carrito con promoción 3x2", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getAllByRole("button", { name: "Agregar al carrito" })[1]);
+    const increase = screen.getByRole("button", { name: "Aumentar cantidad de Chullo tejido" });
+    for (let quantity = 1; quantity < 7; quantity++) {
+      await user.click(increase);
+    }
+    await user.type(screen.getByLabelText("Cupón"), "BIENVENIDA20");
+    await user.click(screen.getByRole("button", { name: "Aplicar" }));
+    const coupon = screen.getByText("Cupón BIENVENIDA20").parentElement as HTMLElement;
+    expect(within(coupon).getByText("− S/ 45.00")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Disminuir cantidad de Chullo tejido" }));
+
+    expect(screen.getByText("Cupón BIENVENIDA20")).toBeInTheDocument();
+    expect(within(coupon).getByText("S/ 0.00")).toBeInTheDocument();
+    expect(
+      screen.getByText("El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00"),
+    ).toBeInTheDocument();
   });
 });
