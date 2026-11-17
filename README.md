@@ -39,11 +39,22 @@ Página de tienda con carrito de compras, hecha con React 18, Vite y TypeScript.
 ## Reglas de precio
 
 1. Subtotal = suma de precio por cantidad de cada línea.
-2. Promoción 3x2 (Chullo tejido y Miel de abeja 350 g): por cada producto en promoción se descuenta la parte entera de (cantidad / 3) por su precio.
+2. Promoción 3x2 (Chullo tejido y Miel de abeja 350 g): por cada producto en promoción se descuenta la parte entera de (cantidad / 3) por su precio; cada producto se calcula por separado.
 3. Cupones: `ANDES10` (10 %, sin mínimo) y `BIENVENIDA20` (20 %, compra mínima de S/ 200.00). El cupón se calcula sobre el subtotal ya descontadas las promociones. `BIENVENIDA20` solo descuenta mientras ese importe sea de S/ 200.00 o más; si el carrito cambia y deja de cumplirlo, el cupón deja de descontar y el carrito muestra el aviso «El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00». Un código desconocido muestra «Cupón no válido».
 4. Envío: S/ 15.00; gratis cuando (subtotal − promociones − cupón) es de S/ 150.00 o más. Con el carrito vacío no hay envío.
 5. IGV = 18 % de (subtotal − promociones − cupón + envío). Total = esa base más el IGV.
 6. Cada importe mostrado se redondea a 2 decimales.
+
+Ejemplo resuelto: 3 Chullos tejidos (S/ 45.00 c/u).
+
+| Línea | Cálculo | Importe |
+|---|---|---|
+| Subtotal | 3 × 45.00 | S/ 135.00 |
+| Promociones | 1 × 45.00 | − S/ 45.00 |
+| Cupón | sin cupón | S/ 0.00 |
+| Envío | 135.00 − 45.00 = 90.00, menos de 150.00 | S/ 15.00 |
+| IGV (18 %) | 18 % de (90.00 + 15.00) | S/ 18.90 |
+| Total | 105.00 + 18.90 | S/ 123.90 |
 
 Ejemplo resuelto: 4 Chullos tejidos (S/ 45.00 c/u) y el cupón `ANDES10`.
 
