@@ -110,23 +110,3 @@ button.link:hover { background: none; color: var(--accent-dark); }
 .stock { margin: 0; color: var(--muted); font-size: 0.9rem; }
 .stock.sold-out { color: #8a1f17; font-weight: 600; }
 button:disabled { opacity: 0.5; cursor: not-allowed; background: var(--accent); }
-
-.installments {
-  margin-top: 24px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
-}
-.installments-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
-.installments-facts, .installments-totals { margin: 0 0 12px; max-width: 420px; }
-.installments-facts div, .installments-totals div { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; }
-.installments-facts dt, .installments-facts dd, .installments-totals dt, .installments-totals dd { margin: 0; }
-.installments-totals { margin: 12px 0 0; }
-.installments-totals div:last-child { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 8px; font-weight: 700; }
-.installments-table { overflow-x: auto; margin-top: 12px; }
-.installments table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-.installments caption { text-align: left; font-weight: 600; padding-bottom: 8px; }
-.installments th, .installments td { padding: 6px 10px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
-.installments th:first-child, .installments td:first-child { text-align: left; }
-.installments th { color: var(--muted); font-size: 0.9rem; }

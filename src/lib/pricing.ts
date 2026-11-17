@@ -40,7 +40,7 @@ export function findCoupon(code: string): Coupon | undefined {
 export function promotionsDiscount(lines: CartLine[]): number {
   const discount = lines.reduce((sum, line) => {
     if (line.product.promo !== "3x2") return sum;
-    return sum + Math.floor(line.quantity / PROMO_GROUP_SIZE) * line.product.price;
+    return sum + Math.floor((line.quantity - 1) / PROMO_GROUP_SIZE) * line.product.price;
   }, 0);
   return round2(discount);
 }
@@ -49,30 +49,40 @@ export function minimumMessage(coupon: Coupon): string {
   return `El cupón ${coupon.code} requiere una compra mínima de ${formatCurrency(coupon.minimum)}`;
 }
 
+export function meetsMinimum(coupon: Coupon, lines: CartLine[]): boolean {
+  if (coupon.minimum === 0) return true;
+  return lines.some((line) => line.product.price * line.quantity >= coupon.minimum);
+}
+
 export function applyCoupon(code: string, lines: CartLine[]): CouponResult {
   const coupon = findCoupon(code);
   if (!coupon) return { ok: false, message: "Cupón no válido" };
-  const discounted = round2(subtotal(lines) - promotionsDiscount(lines));
-  if (discounted < coupon.minimum) return { ok: false, message: minimumMessage(coupon) };
+  if (!meetsMinimum(coupon, lines)) return { ok: false, message: minimumMessage(coupon) };
   return { ok: true, coupon };
 }
 
-export function couponDiscount(coupon: Coupon | null, lines: CartLine[]): number {
-  if (!coupon) return 0;
-  return round2(subtotal(lines) * coupon.rate);
+export function couponNotice(coupon: Coupon | null, lines: CartLine[]): string | null {
+  if (!coupon || meetsMinimum(coupon, lines)) return null;
+  return minimumMessage(coupon);
 }
 
-export function shippingCost(lines: CartLine[]): number {
+export function couponDiscount(coupon: Coupon | null, lines: CartLine[]): number {
+  if (!coupon || !meetsMinimum(coupon, lines)) return 0;
+  return round2((subtotal(lines) - promotionsDiscount(lines)) * coupon.rate);
+}
+
+export function shippingCost(lines: CartLine[], couponAmount = 0): number {
   if (lines.length === 0) return 0;
-  return round2(subtotal(lines)) >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+  const net = round2(subtotal(lines) - promotionsDiscount(lines) - couponAmount);
+  return net >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
 }
 
 export function computeBreakdown(lines: CartLine[], coupon: Coupon | null): Breakdown {
   const sub = round2(subtotal(lines));
   const promotions = promotionsDiscount(lines);
   const couponAmount = couponDiscount(coupon, lines);
-  const shipping = shippingCost(lines);
-  const base = sub - promotions - couponAmount + shipping;
+  const shipping = shippingCost(lines, couponAmount);
+  const base = sub - promotions + shipping;
   const igv = round2(base * IGV_RATE);
   return {
     subtotal: sub,

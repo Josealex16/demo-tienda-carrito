@@ -46,8 +46,9 @@ describe("App", () => {
     render(<App />);
     const add = screen.getAllByRole("button", { name: "Agregar al carrito" })[1];
     await user.click(add);
-    await user.click(screen.getByRole("button", { name: "Aumentar cantidad de Chullo tejido" }));
-    await user.click(screen.getByRole("button", { name: "Aumentar cantidad de Chullo tejido" }));
+    for (let i = 0; i < 3; i++) {
+      await user.click(screen.getByRole("button", { name: "Aumentar cantidad de Chullo tejido" }));
+    }
     const promo = screen.getByText("Promociones").parentElement as HTMLElement;
     expect(within(promo).getByText("− S/ 45.00")).toBeInTheDocument();
     const shipping = screen.getByText("Envío").parentElement as HTMLElement;
@@ -81,5 +82,45 @@ describe("App", () => {
     await user.click(screen.getAllByRole("button", { name: "Agregar al carrito" })[0]);
     const shipping = screen.getByText("Envío").parentElement as HTMLElement;
     expect(within(shipping).getByText("Gratis")).toBeInTheDocument();
+  });
+
+  it("muestra la línea del cupón ANDES10 con dos mantas", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const add = screen.getAllByRole("button", { name: "Agregar al carrito" })[2];
+    await user.click(add);
+    await user.click(add);
+    await user.type(screen.getByLabelText("Cupón"), "ANDES10");
+    await user.click(screen.getByRole("button", { name: "Aplicar" }));
+    const coupon = screen.getByText("Cupón ANDES10").parentElement as HTMLElement;
+    expect(within(coupon).getByText("− S/ 24.00")).toBeInTheDocument();
+  });
+
+  it("rechaza BIENVENIDA20 con una sola manta", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getAllByRole("button", { name: "Agregar al carrito" })[2]);
+    await user.type(screen.getByLabelText("Cupón"), "BIENVENIDA20");
+    await user.click(screen.getByRole("button", { name: "Aplicar" }));
+    expect(
+      screen.getByText("El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00"),
+    ).toBeInTheDocument();
+  });
+
+  it("avisa cuando el cupón aplicado deja de cumplir el mínimo", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const add = screen.getAllByRole("button", { name: "Agregar al carrito" })[2];
+    await user.click(add);
+    await user.click(add);
+    await user.type(screen.getByLabelText("Cupón"), "BIENVENIDA20");
+    await user.click(screen.getByRole("button", { name: "Aplicar" }));
+    const coupon = screen.getByText("Cupón BIENVENIDA20").parentElement as HTMLElement;
+    expect(within(coupon).getByText("− S/ 48.00")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Disminuir cantidad de Manta andina" }));
+    expect(
+      screen.getByText("El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00"),
+    ).toBeInTheDocument();
+    expect(within(coupon).getByText("S/ 0.00")).toBeInTheDocument();
   });
 });

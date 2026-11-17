@@ -1,6 +1,6 @@
 # Tienda Andes
 
-Página de tienda con carrito de compras, hecha con React 18, Vite y TypeScript. La interfaz está en español y los importes se muestran en soles (S/). Incluye catálogo con búsqueda, categorías, orden y stock, carrito con control de cantidades y promociones 3x2, cupones de descuento, envío y resumen con subtotal, descuentos, IGV (18 %) y total, y un simulador de pago en cuotas con cronograma de pagos.
+Página de tienda con carrito de compras, hecha con React 18, Vite y TypeScript. La interfaz está en español y los importes se muestran en soles (S/). Incluye catálogo con búsqueda, categorías, orden y stock, carrito con control de cantidades y promociones 3x2, cupones de descuento, envío y resumen con subtotal, descuentos, IGV (18 %) y total.
 
 ## Requisitos
 
@@ -24,9 +24,8 @@ Página de tienda con carrito de compras, hecha con React 18, Vite y TypeScript.
 - `src/lib/cart.ts`: funciones puras del carrito (agregar, cambiar cantidad, quitar, subtotal, IGV y total).
 - `src/lib/pricing.ts`: funciones puras de precio (promociones, cupones, envío, IGV y desglose).
 - `src/lib/format.ts`: formato de moneda.
-- `src/lib/installments.ts`: funciones puras del pago en cuotas (cuota inicial, tasas, cuota fija y cronograma).
 - `src/lib/catalog.ts`: funciones puras del catálogo (búsqueda, categoría, orden y contador).
-- `src/components/`: `ProductList`, `CatalogToolbar`, `Cart`, `CouponForm`, `Summary` e `Installments`.
+- `src/components/`: `ProductList`, `CatalogToolbar`, `Cart`, `CouponForm` y `Summary`.
 - `src/App.tsx` y `src/main.tsx`: composición y punto de entrada.
 
 ## Reglas del catálogo
@@ -57,26 +56,13 @@ Ejemplo resuelto: 4 Chullos tejidos (S/ 45.00 c/u) y el cupón `ANDES10`.
 | IGV (18 %) | 18 % de (180.00 − 45.00 − 13.50 + 15.00) = 18 % de 136.50 | S/ 24.57 |
 | Total | 136.50 + 24.57 | S/ 161.07 |
 
-## Reglas de pago en cuotas
+Segundo ejemplo resuelto: 2 Mantas andinas (S/ 120.00 c/u) y el cupón `ANDES10`.
 
-1. El monto de la compra es el «Total» del resumen (con promociones, cupón, envío e IGV).
-2. Cuota inicial = porcentaje elegido (0 %, 10 %, 20 % o 30 %) del total, redondeada a 2 decimales. Monto a financiar = total − cuota inicial.
-3. Tasa efectiva anual (TEA): 40 %. Tasa efectiva mensual: TEM = (1 + TEA)^(1/12) − 1, que se muestra como 2.84 %; los cálculos usan la TEM sin redondear.
-4. Cuota fija por el método francés: cuota = monto a financiar × TEM / (1 − (1 + TEM)^(−n)), redondeada a 2 decimales, con n = plazo en meses (3, 6 o 12).
-5. En cada mes: interés = saldo anterior × TEM, redondeado a 2 decimales; amortización = cuota − interés; saldo = saldo anterior − amortización.
-6. En la última cuota la amortización es todo el saldo anterior y la cuota es esa amortización más su interés, de modo que el saldo final es exactamente S/ 0.00.
-7. «3 cuotas sin intereses»: con plazo de 3 meses y un monto a financiar de S/ 300.00 o más, la TEM es 0 %; las dos primeras cuotas son el monto a financiar entre 3, redondeado a 2 decimales, y la última lleva la diferencia.
-8. Total de intereses = suma de los intereses del cronograma. Total a pagar = cuota inicial + suma de las cuotas del cronograma.
-
-Ejemplo resuelto: 1 Poncho de alpaca y 1 Manta andina, total S/ 365.68, cuota inicial 20 % = S/ 73.14, monto a financiar S/ 292.54, plazo 6 meses, cuota S/ 53.72.
-
-| N.º | Cuota | Interés | Amortización | Saldo |
-|---|---|---|---|---|
-| 1 | S/ 53.72 | S/ 8.32 | S/ 45.40 | S/ 247.14 |
-| 2 | S/ 53.72 | S/ 7.03 | S/ 46.69 | S/ 200.45 |
-| 3 | S/ 53.72 | S/ 5.70 | S/ 48.02 | S/ 152.43 |
-| 4 | S/ 53.72 | S/ 4.33 | S/ 49.39 | S/ 103.04 |
-| 5 | S/ 53.72 | S/ 2.93 | S/ 50.79 | S/ 52.25 |
-| 6 | S/ 53.74 | S/ 1.49 | S/ 52.25 | S/ 0.00 |
-
-Total de intereses: S/ 29.80. Total a pagar: S/ 395.48.
+| Línea | Cálculo | Importe |
+|---|---|---|
+| Subtotal | 2 × 120.00 | S/ 240.00 |
+| Promociones | sin productos en promoción | S/ 0.00 |
+| Cupón ANDES10 | 10 % de 240.00 | − S/ 24.00 |
+| Envío | 240.00 − 24.00 = 216.00, 150.00 o más | Gratis |
+| IGV (18 %) | 18 % de (240.00 − 24.00 + 0.00) = 18 % de 216.00 | S/ 38.88 |
+| Total | 216.00 + 38.88 | S/ 254.88 |

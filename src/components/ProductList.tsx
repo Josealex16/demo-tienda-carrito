@@ -1,16 +1,23 @@
 import { useState } from "react";
 import type { Product } from "../data/products";
 import { formatCurrency } from "../lib/format";
-import { applyCatalogFilters, defaultFilters, resultsLabel, type CatalogFilters } from "../lib/catalog";
+import type { CartLine } from "../lib/cart";
+import {
+  applyCatalogFilters,
+  defaultFilters,
+  remainingStock,
+  resultsLabel,
+  type CatalogFilters,
+} from "../lib/catalog";
 import { CatalogToolbar } from "./CatalogToolbar";
 
 interface Props {
   products: Product[];
-  reserved: Record<string, number>;
+  lines: CartLine[];
   onAdd: (product: Product) => void;
 }
 
-export function ProductList({ products, reserved, onAdd }: Props) {
+export function ProductList({ products, lines, onAdd }: Props) {
   const [filters, setFilters] = useState<CatalogFilters>(defaultFilters);
   const visible = applyCatalogFilters(products, filters);
 
@@ -19,12 +26,11 @@ export function ProductList({ products, reserved, onAdd }: Props) {
       <h2 id="productos-titulo">Productos</h2>
       <CatalogToolbar filters={filters} onChange={setFilters} />
       <p className="results" role="status">
-        {resultsLabel(products.length)}
+        {resultsLabel(visible.length)}
       </p>
-      {visible.length === 0 && <p className="empty">No encontramos productos</p>}
       <ul className="products">
         {visible.map((product) => {
-          const left = product.stock - (reserved[product.id] ?? 0);
+          const left = remainingStock(product, lines);
           return (
             <li key={product.id} className="product">
               <h3>{product.name}</h3>
