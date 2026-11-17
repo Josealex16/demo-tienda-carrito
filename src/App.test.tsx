@@ -107,6 +107,20 @@ describe("App", () => {
     ).toBeInTheDocument();
   });
 
+  it("acepta BIENVENIDA20 sumando Poncho y Manta", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const add = screen.getAllByRole("button", { name: "Agregar al carrito" });
+    await user.click(add[0]);
+    await user.click(add[2]);
+    await user.type(screen.getByLabelText("Cupón"), "BIENVENIDA20");
+    await user.click(screen.getByRole("button", { name: "Aplicar" }));
+    const coupon = screen.getByText("Cupón BIENVENIDA20").parentElement as HTMLElement;
+    expect(within(coupon).getByText("− S/ 61.98")).toBeInTheDocument();
+    expect(screen.queryByText("El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00"))
+      .not.toBeInTheDocument();
+  });
+
   it("avisa cuando el cupón aplicado deja de cumplir el mínimo", async () => {
     const user = userEvent.setup();
     render(<App />);

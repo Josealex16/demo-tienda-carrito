@@ -1,5 +1,5 @@
 import { products } from "../data/products";
-import { addToCart, changeQuantity, type CartLine } from "./cart";
+import { addToCart, changeQuantity, subtotal, type CartLine } from "./cart";
 import {
   applyCoupon,
   computeBreakdown,
@@ -15,6 +15,10 @@ const byId = (id: string) => products.find((p) => p.id === id)!;
 
 function cartOf(...entries: [string, number][]): CartLine[] {
   return entries.map(([id, quantity]) => ({ product: byId(id), quantity }));
+}
+
+function cartWithPrice(price: number): CartLine[] {
+  return [{ product: { ...byId("cacao"), price }, quantity: 1 }];
 }
 
 describe("round2", () => {
@@ -88,9 +92,42 @@ describe("findCoupon / applyCoupon", () => {
   it("acepta BIENVENIDA20 al alcanzar el mínimo", () => {
     expect(applyCoupon("BIENVENIDA20", cartOf(["manta", 2])).ok).toBe(true);
   });
+
+  it("acepta BIENVENIDA20 cuando el total global alcanza S/ 200.00", () => {
+    const coupon = findCoupon("BIENVENIDA20")!;
+    const lines = cartWithPrice(200);
+    expect(applyCoupon("BIENVENIDA20", lines).ok).toBe(true);
+    expect(couponDiscount(coupon, lines)).toBe(40);
+    expect(couponNotice(coupon, lines)).toBeNull();
+  });
+
+  it("rechaza BIENVENIDA20 cuando el importe global es S/ 199.99", () => {
+    const coupon = findCoupon("BIENVENIDA20")!;
+    const lines = cartWithPrice(199.99);
+    expect(couponDiscount(coupon, lines)).toBe(0);
+    expect(couponNotice(coupon, lines)).toBe(
+      "El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00",
+    );
+  });
+
+  it("compara el mínimo después de descontar promociones", () => {
+    const coupon = findCoupon("BIENVENIDA20")!;
+    const lines = cartOf(["chullo", 5]);
+    expect(subtotal(lines)).toBe(225);
+    expect(promotionsDiscount(lines)).toBe(45);
+    expect(applyCoupon("BIENVENIDA20", lines)).toEqual({
+      ok: false,
+      message: "El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00",
+    });
+    expect(couponDiscount(coupon, lines)).toBe(0);
+  });
 });
 
 describe("couponDiscount / couponNotice", () => {
+  it("descuenta S/ 24.00 con ANDES10 en dos Mantas", () => {
+    expect(couponDiscount(findCoupon("ANDES10")!, cartOf(["manta", 2]))).toBe(24);
+  });
+
   it("calcula ANDES10 sobre el subtotal sin promociones", () => {
     expect(couponDiscount(findCoupon("ANDES10")!, cartOf(["manta", 1], ["cafe", 1]))).toBe(15.25);
   });
@@ -101,6 +138,12 @@ describe("couponDiscount / couponNotice", () => {
 
   it("calcula BIENVENIDA20 cuando se cumple el mínimo", () => {
     expect(couponDiscount(findCoupon("BIENVENIDA20")!, cartOf(["manta", 2]))).toBe(48);
+  });
+
+  it("calcula BIENVENIDA20 sobre el total global después de promociones", () => {
+    const lines = cartOf(["poncho", 1], ["manta", 1]);
+    expect(subtotal(lines) - promotionsDiscount(lines)).toBe(309.9);
+    expect(couponDiscount(findCoupon("BIENVENIDA20")!, lines)).toBe(61.98);
   });
 
   it("deja de descontar y avisa si el carrito ya no cumple el mínimo", () => {

@@ -49,9 +49,13 @@ export function minimumMessage(coupon: Coupon): string {
   return `El cupón ${coupon.code} requiere una compra mínima de ${formatCurrency(coupon.minimum)}`;
 }
 
+function couponBase(lines: CartLine[]): number {
+  return round2(subtotal(lines) - promotionsDiscount(lines));
+}
+
 export function meetsMinimum(coupon: Coupon, lines: CartLine[]): boolean {
   if (coupon.minimum === 0) return true;
-  return lines.some((line) => line.product.price * line.quantity >= coupon.minimum);
+  return couponBase(lines) >= coupon.minimum;
 }
 
 export function applyCoupon(code: string, lines: CartLine[]): CouponResult {
@@ -68,7 +72,7 @@ export function couponNotice(coupon: Coupon | null, lines: CartLine[]): string |
 
 export function couponDiscount(coupon: Coupon | null, lines: CartLine[]): number {
   if (!coupon || !meetsMinimum(coupon, lines)) return 0;
-  return round2((subtotal(lines) - promotionsDiscount(lines)) * coupon.rate);
+  return round2(couponBase(lines) * coupon.rate);
 }
 
 export function shippingCost(lines: CartLine[], couponAmount = 0): number {
