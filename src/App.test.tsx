@@ -96,6 +96,29 @@ describe("App", () => {
     expect(within(coupon).getByText("− S/ 24.00")).toBeInTheDocument();
   });
 
+  it("muestra el desglose final de dos Mantas con ANDES10", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const addManta = screen.getAllByRole("button", { name: "Agregar al carrito" })[2];
+    await user.click(addManta);
+    await user.click(addManta);
+    await user.type(screen.getByLabelText("Cupón"), "ANDES10");
+    await user.click(screen.getByRole("button", { name: "Aplicar" }));
+
+    const subtotal = screen.getByText("Subtotal").parentElement as HTMLElement;
+    expect(within(subtotal).getByText("S/ 240.00")).toBeInTheDocument();
+    const promotions = screen.getByText("Promociones").parentElement as HTMLElement;
+    expect(within(promotions).getByText("S/ 0.00")).toBeInTheDocument();
+    const coupon = screen.getByText("Cupón ANDES10").parentElement as HTMLElement;
+    expect(within(coupon).getByText("− S/ 24.00")).toBeInTheDocument();
+    const shipping = screen.getByText("Envío").parentElement as HTMLElement;
+    expect(within(shipping).getByText("Gratis")).toBeInTheDocument();
+    const igv = screen.getByText("IGV (18 %)").parentElement as HTMLElement;
+    expect(within(igv).getByText("S/ 38.88")).toBeInTheDocument();
+    const total = screen.getByText("Total").parentElement as HTMLElement;
+    expect(within(total).getByText("S/ 254.88")).toBeInTheDocument();
+  });
+
   it("rechaza BIENVENIDA20 con una sola manta", async () => {
     const user = userEvent.setup();
     render(<App />);
