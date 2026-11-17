@@ -40,7 +40,7 @@ export function findCoupon(code: string): Coupon | undefined {
 export function promotionsDiscount(lines: CartLine[]): number {
   const discount = lines.reduce((sum, line) => {
     if (line.product.promo !== "3x2") return sum;
-    return sum + Math.floor((line.quantity - 1) / PROMO_GROUP_SIZE) * line.product.price;
+    return sum + Math.floor(line.quantity / PROMO_GROUP_SIZE) * line.product.price;
   }, 0);
   return round2(discount);
 }
