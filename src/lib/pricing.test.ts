@@ -200,9 +200,17 @@ describe("shippingCost", () => {
     expect(shippingCost(cartOf(["manta", 1]))).toBe(15);
   });
 
+  it("cobra envío con un neto de S/ 149.99", () => {
+    expect(shippingCost(cartWithPrice(149.99))).toBe(15);
+  });
+
   it("es gratis desde S/ 150.00 sin descuentos", () => {
     expect(shippingCost(cartOf(["poncho", 1]))).toBe(0);
     expect(shippingCost(cartOf(["manta", 1], ["cafe", 1]))).toBe(0);
+  });
+
+  it("da envío gratis con un neto de S/ 150.00", () => {
+    expect(shippingCost(cartWithPrice(150))).toBe(0);
   });
 
   it("descuenta las promociones antes de decidir el envío", () => {
@@ -219,6 +227,28 @@ describe("computeBreakdown", () => {
       shipping: 0,
       igv: 0,
       total: 0,
+    });
+  });
+
+  it("redondea a dos decimales cada importe del desglose", () => {
+    expect(computeBreakdown(cartWithPrice(10.005), null)).toEqual({
+      subtotal: 10.01,
+      promotions: 0,
+      coupon: 0,
+      shipping: 15,
+      igv: 4.5,
+      total: 29.51,
+    });
+  });
+
+  it("incluye ANDES10 en el neto, envío, IGV y total de dos Mantas", () => {
+    expect(computeBreakdown(cartOf(["manta", 2]), findCoupon("ANDES10")!)).toEqual({
+      subtotal: 240,
+      promotions: 0,
+      coupon: 24,
+      shipping: 0,
+      igv: 38.88,
+      total: 254.88,
     });
   });
 

@@ -49,8 +49,12 @@ export function minimumMessage(coupon: Coupon): string {
   return `El cupón ${coupon.code} requiere una compra mínima de ${formatCurrency(coupon.minimum)}`;
 }
 
+function netAmount(lines: CartLine[], couponAmount: number): number {
+  return round2(round2(subtotal(lines)) - promotionsDiscount(lines) - round2(couponAmount));
+}
+
 function couponBase(lines: CartLine[]): number {
-  return round2(subtotal(lines) - promotionsDiscount(lines));
+  return netAmount(lines, 0);
 }
 
 export function meetsMinimum(coupon: Coupon, lines: CartLine[]): boolean {
@@ -77,7 +81,7 @@ export function couponDiscount(coupon: Coupon | null, lines: CartLine[]): number
 
 export function shippingCost(lines: CartLine[], couponAmount = 0): number {
   if (lines.length === 0) return 0;
-  const net = round2(subtotal(lines) - promotionsDiscount(lines) - couponAmount);
+  const net = netAmount(lines, couponAmount);
   return net >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
 }
 
@@ -86,7 +90,8 @@ export function computeBreakdown(lines: CartLine[], coupon: Coupon | null): Brea
   const promotions = promotionsDiscount(lines);
   const couponAmount = couponDiscount(coupon, lines);
   const shipping = shippingCost(lines, couponAmount);
-  const base = sub - promotions + shipping;
+  const net = netAmount(lines, couponAmount);
+  const base = round2(net + shipping);
   const igv = round2(base * IGV_RATE);
   return {
     subtotal: sub,
