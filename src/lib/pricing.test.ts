@@ -101,9 +101,39 @@ describe("findCoupon / applyCoupon", () => {
     expect(couponNotice(coupon, lines)).toBeNull();
   });
 
+  it("suma y redondea el importe global antes de evaluar el mínimo", () => {
+    const coupon = findCoupon("BIENVENIDA20")!;
+    const lines: CartLine[] = [
+      { product: { ...byId("cacao"), id: "cacao-a", price: 99.999 }, quantity: 1 },
+      { product: { ...byId("cacao"), id: "cacao-b", price: 100 }, quantity: 1 },
+    ];
+
+    expect(subtotal(lines)).toBe(199.999);
+    expect(applyCoupon("BIENVENIDA20", lines)).toEqual({ ok: true, coupon });
+    expect(couponDiscount(coupon, lines)).toBe(40);
+    expect(couponNotice(coupon, lines)).toBeNull();
+  });
+
   it("rechaza BIENVENIDA20 cuando el importe global es S/ 199.99", () => {
     const coupon = findCoupon("BIENVENIDA20")!;
     const lines = cartWithPrice(199.99);
+    expect(couponDiscount(coupon, lines)).toBe(0);
+    expect(couponNotice(coupon, lines)).toBe(
+      "El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00",
+    );
+  });
+
+  it("rechaza el mínimo de S/ 199.99 después de redondear las promociones globales", () => {
+    const coupon = findCoupon("BIENVENIDA20")!;
+    const lines: CartLine[] = [
+      { product: { ...byId("chullo"), price: 99.995 }, quantity: 3 },
+    ];
+
+    expect(subtotal(lines) - promotionsDiscount(lines)).toBeCloseTo(199.985);
+    expect(applyCoupon("BIENVENIDA20", lines)).toEqual({
+      ok: false,
+      message: "El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00",
+    });
     expect(couponDiscount(coupon, lines)).toBe(0);
     expect(couponNotice(coupon, lines)).toBe(
       "El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00",

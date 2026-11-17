@@ -137,4 +137,26 @@ describe("App", () => {
     ).toBeInTheDocument();
     expect(within(coupon).getByText("S/ 0.00")).toBeInTheDocument();
   });
+
+  it("actualiza la vigencia del cupón al cambiar un carrito con promoción 3x2", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getAllByRole("button", { name: "Agregar al carrito" })[1]);
+    const increase = screen.getByRole("button", { name: "Aumentar cantidad de Chullo tejido" });
+    for (let quantity = 1; quantity < 7; quantity++) {
+      await user.click(increase);
+    }
+    await user.type(screen.getByLabelText("Cupón"), "BIENVENIDA20");
+    await user.click(screen.getByRole("button", { name: "Aplicar" }));
+    const coupon = screen.getByText("Cupón BIENVENIDA20").parentElement as HTMLElement;
+    expect(within(coupon).getByText("− S/ 45.00")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Disminuir cantidad de Chullo tejido" }));
+
+    expect(screen.getByText("Cupón BIENVENIDA20")).toBeInTheDocument();
+    expect(within(coupon).getByText("S/ 0.00")).toBeInTheDocument();
+    expect(
+      screen.getByText("El cupón BIENVENIDA20 requiere una compra mínima de S/ 200.00"),
+    ).toBeInTheDocument();
+  });
 });
