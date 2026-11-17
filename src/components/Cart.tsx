@@ -31,6 +31,7 @@ export function Cart({ lines, onChangeQuantity, onRemove }: Props) {
                 <button
                   type="button"
                   aria-label={`Aumentar cantidad de ${product.name}`}
+                  disabled={quantity >= product.stock}
                   onClick={() => onChangeQuantity(product.id, 1)}
                 >
                   +

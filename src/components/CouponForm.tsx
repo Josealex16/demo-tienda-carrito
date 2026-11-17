@@ -4,11 +4,12 @@ import type { Coupon } from "../lib/pricing";
 interface Props {
   applied: Coupon | null;
   error: string | null;
+  notice: string | null;
   onApply: (code: string) => void;
   onRemove: () => void;
 }
 
-export function CouponForm({ applied, error, onApply, onRemove }: Props) {
+export function CouponForm({ applied, error, notice, onApply, onRemove }: Props) {
   const [code, setCode] = useState("");
 
   function handleSubmit(event: FormEvent) {
@@ -28,6 +29,11 @@ export function CouponForm({ applied, error, onApply, onRemove }: Props) {
       {error && (
         <p className="error" role="alert">
           {error}
+        </p>
+      )}
+      {notice && (
+        <p className="error" role="status">
+          {notice}
         </p>
       )}
       {applied && (
