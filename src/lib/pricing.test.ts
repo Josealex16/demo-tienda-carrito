@@ -30,6 +30,14 @@ describe("promotionsDiscount", () => {
     expect(promotionsDiscount(cartOf(["chullo", 2]))).toBe(0);
   });
 
+  it("descuenta un Chullo al completar tres unidades", () => {
+    expect(promotionsDiscount(cartOf(["chullo", 3]))).toBe(45);
+  });
+
+  it("descuenta cada grupo completo de tres Chullos", () => {
+    expect(promotionsDiscount(cartOf(["chullo", 6]))).toBe(90);
+  });
+
   it("descuenta una unidad por cada grupo de tres", () => {
     expect(promotionsDiscount(cartOf(["chullo", 4]))).toBe(45);
     expect(promotionsDiscount(cartOf(["chullo", 5]))).toBe(45);
@@ -42,6 +50,14 @@ describe("promotionsDiscount", () => {
 
   it("suma las promociones de productos distintos", () => {
     expect(promotionsDiscount(cartOf(["chullo", 4], ["miel", 4]))).toBe(63.9);
+  });
+
+  it("aplica una promoción por separado a tres Chullos y tres Mieles", () => {
+    expect(promotionsDiscount(cartOf(["chullo", 3], ["miel", 3]))).toBe(63.9);
+  });
+
+  it("no combina dos Chullos y una Miel para formar un grupo", () => {
+    expect(promotionsDiscount(cartOf(["chullo", 2], ["miel", 1]))).toBe(0);
   });
 });
 
@@ -141,6 +157,17 @@ describe("computeBreakdown", () => {
       shipping: 15,
       igv: 27,
       total: 177,
+    });
+  });
+
+  it("calcula el desglose 3x2 de tres Chullos", () => {
+    expect(computeBreakdown(cartOf(["chullo", 3]), null)).toEqual({
+      subtotal: 135,
+      promotions: 45,
+      coupon: 0,
+      shipping: 15,
+      igv: 18.9,
+      total: 123.9,
     });
   });
 
